@@ -1,0 +1,52 @@
+body {
+  font-family: "Roboto Slab", sans-serif;
+}
+
+header {
+  margin: 0;
+  padding: 10px 30px;
+  background: #1b78cf;
+  color: #dce0e6;
+  font-size: 1.5rem;
+}
+
+header h1 {
+  margin: 0;
+  padding: 0;
+}
+
+.block {
+  height: 75px;
+  width: 60px;
+  margin: 7px;
+  line-height: 75px;
+  text-align: center;
+  border: 3px solid gray;
+  border-radius: 5px;
+  font-size: xx-large;
+  font-weight: bold;
+}
+
+.row {
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  width: 80vw;
+  margin: 0 auto;
+}
+
+.success {
+  background: #2bd40d;
+}
+
+.warning {
+  background: #ebd80e;
+}
+
+#gameboard {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+}

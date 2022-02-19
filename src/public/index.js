@@ -5,12 +5,13 @@
 
   // Just some game params maybe someday it will use an API
   let currentGuess = "";
-  let word = "words";
+  let word = "";
   let currentGuessNumber = 1;
   let grid = [];
 
   /** Does the setup things. */
   function init() {
+    getNewWord();
     currentGuessNumber = 1;
     currentGuess = "";
     grid = [];
@@ -47,7 +48,6 @@
   function createRow() {
     const row = gen("section");
     row.classList.add("row");
-    row.classList.add("justify-content-center");
     return row;
   }
 
@@ -58,13 +58,6 @@
   function createBlock() {
     const block = gen("p");
     block.classList.add("block");
-    block.classList.add("border");
-    block.classList.add("border-secondary");
-    block.classList.add("border-3");
-    block.classList.add("rounded");
-    block.classList.add("bg-gradient");
-    block.classList.add("text-center");
-    block.classList.add("fs-1");
     return block;
   }
 
@@ -95,9 +88,9 @@
   function submitWord() {
     for (let i = 0; i < word.length; i++) {
       if (word[i] === currentGuess[i]) {
-        grid[currentGuessNumber - 1][i].classList.add("bg-success");
+        grid[currentGuessNumber - 1][i].classList.add("success");
       } else if (word.indexOf(currentGuess[i]) !== -1) {
-        grid[currentGuessNumber - 1][i].classList.add("bg-warning");
+        grid[currentGuessNumber - 1][i].classList.add("warning");
       }
     }
 
@@ -129,6 +122,16 @@
     }, 2000)
   }
 
+  function getNewWord() {
+    fetch("/word")
+      .then(checkStatus)
+      .then(res => res.json())
+      .then(data => {
+        console.log(data.word);
+        word = data.word;
+      }).catch(handleError);
+  }
+
   /**
    * Check whether fetch returned a status of 200 OK, throw an error if not.
    * @param {object} response - The response object from the API for the GET request.
@@ -139,6 +142,11 @@
       return response;
     }
     throw Error("Error in request: " + response.statusText);
+  }
+
+  /** This should probably do something */
+  function handleError(error) {
+    console.log(error);
   }
 
   /**
