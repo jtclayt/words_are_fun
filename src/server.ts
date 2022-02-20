@@ -1,21 +1,30 @@
+import dotenv from "dotenv";
 import express from "express";
 import path from "path";
+dotenv.config({ path: path.resolve(process.cwd(), 'env/.env')});
 
-const app = express();
-const port = process.env.PORT || 5000;
+import { App } from "./app";
+import { setup } from "./config/setup";
 
-// Maybe get a database or something
-const words = ["about", "crude", "crush", "dates", "words", "hello", "fresh", "anger"];
+const port: number = Number(process.env.PORT) || 5000;
 
-app.use("/public", express.static(path.join(__dirname, "public")));
+try {
+  setup();
+  App.instance.use("/public", express.static(path.join(__dirname, "../public")));
 
-app.get("/", (_, res) => {
+  App.instance.get("/", (_, res) => {
+    res.sendFile(path.join(__dirname, '/public/index.html'));
+  });
+} catch (error) {
+  console.log(`Startup error: ${error}`);
+}
+
+App.instance.use("/public", express.static(path.join(__dirname, "public")));
+
+App.instance.get("/", (_, res) => {
   res.sendFile(path.join(__dirname, '/public/index.html'));
-})
+});
 
-app.get("/word", (_, res) => {
-  const randomIndex = Math.floor(Math.random() * words.length);
-  res.status(200).send({word: words[randomIndex]});
-})
-
-app.listen(port, () => console.log(`Running on port ${port}`));
+App.instance.listen(port, () => {
+  console.log(`App is listening on port ${port}`);
+});
