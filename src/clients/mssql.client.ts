@@ -40,21 +40,12 @@ export class MSSqlClient {
     });
     // beforeConnect hook not playing nicely with typescript, make config any as workaround
     this.db.addHook("beforeConnect", async (config: any) => {
-      const token = await this.getAADToken();
-      config.dialectOptions.authentication.options.token = token;
+      config.dialectOptions.authentication.options.token = await getAADTokenAsync(
+        process.env[EnvironmentKeys.AzureClientId],
+        process.env[EnvironmentKeys.AzureClientSecret],
+        process.env[EnvironmentKeys.AzureTenantId],
+        AZURE_DB_LOGIN_URL
+      );;
     });
-  }
-
-  /**
-   * Helper method for retrieving service principal token for DB.
-   * @returns The token for connecting.
-   */
-  private async getAADToken(): Promise<string> {
-    return await getAADTokenAsync(
-      process.env[EnvironmentKeys.AzureClientId],
-      process.env[EnvironmentKeys.AzureClientSecret],
-      process.env[EnvironmentKeys.AzureTenantId],
-      AZURE_DB_LOGIN_URL
-    );
   }
 }
