@@ -4,10 +4,10 @@
   window.addEventListener('load', init);
 
   // Just some game params maybe someday it will use an API
-  let currentGuess = "";
-  let word = "";
-  let currentGuessNumber = 1;
-  let grid = [];
+  let currentGuess;
+  let wordId;
+  let currentGuessNumber;
+  let grid;
 
   /** Does the setup things. */
   function init() {
@@ -78,7 +78,6 @@
     } else if (e.keyCode === 8) {
       if (currentGuess.length > 0) {
         currentGuess = currentGuess.slice(0, currentGuess.length - 1);
-        console.log(currentGuess);
         grid[currentGuessNumber - 1][currentGuess.length].textContent = "";
       }
     }
@@ -86,20 +85,15 @@
 
   /** Thinks pretty hard about words and stuff. */
   function submitWord() {
-    for (let i = 0; i < word.length; i++) {
-      if (word[i] === currentGuess[i]) {
-        grid[currentGuessNumber - 1][i].classList.add("success");
-      } else if (word.indexOf(currentGuess[i]) !== -1) {
-        grid[currentGuessNumber - 1][i].classList.add("warning");
-      }
-    }
-
-    if (word === currentGuess || currentGuessNumber === 6) {
-      onEndGame(word === currentGuess);
-    }
-
-    currentGuessNumber++;
-    currentGuess = "";
+    fetch("/check_word", {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8'
+      },
+      body: JSON.stringify({wordId: wordId, guess: currentGuess})
+    }).then(checkStatus)
+      .then(res => res.json())
+      .then(data => parseResult(data.result)).catch(handleError);
   }
 
   /**
@@ -123,13 +117,37 @@
   }
 
   function getNewWord() {
-    fetch("/word")
+    fetch("/new_word")
       .then(checkStatus)
       .then(res => res.json())
       .then(data => {
-        console.log(data.word);
-        word = data.word;
+        wordId = data.wordId;
       }).catch(handleError);
+  }
+
+  function parseResult(resultArray) {
+    let isGuessCorrect = true;
+
+    resultArray.forEach((letterResult, index) => {
+      switch (letterResult) {
+        case "g":
+          grid[currentGuessNumber-1][index].classList.add("success");
+          break;
+        case "y":
+          isGuessCorrect = false;
+          grid[currentGuessNumber-1][index].classList.add("warning");
+          break;
+        default:
+          isGuessCorrect = false;
+      }
+    });
+
+    if (isGuessCorrect || currentGuessNumber === 6) {
+      onEndGame(isGuessCorrect);
+    }
+
+    currentGuessNumber++;
+    currentGuess = "";
   }
 
   /**
