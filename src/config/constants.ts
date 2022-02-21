@@ -9,3 +9,9 @@ export enum EnvironmentKeys {
   DbName = "DB_NAME",
   AppInsightsKey = "APPINSIGHTS_INSTRUMENTATIONKEY"
 }
+
+export enum LetterResult {
+  Correct = "g",
+  WrongPlace = "y",
+  NotInWord = "n"
+}

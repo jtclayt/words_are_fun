@@ -1,6 +1,6 @@
 import { Sequelize } from "sequelize";
 import { AZURE_DB_LOGIN_URL, EnvironmentKeys } from "../config/constants";
-import { getAADTokenAsync } from "../helpers/get-aad-token";
+import { getAADTokenAsync } from "../helpers/getAADTokenAsync";
 
 /**
  * Singleton class for handling DB connection.
