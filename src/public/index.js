@@ -116,6 +116,7 @@
     }, 2000)
   }
 
+  /** Should probably document this */
   function getNewWord() {
     fetch("/new_word")
       .then(checkStatus)
@@ -125,6 +126,7 @@
       }).catch(handleError);
   }
 
+  /** TODO: write a better TODO */
   function parseResult(resultArray) {
     let isGuessCorrect = true;
 
