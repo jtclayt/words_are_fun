@@ -4,7 +4,8 @@
   "description": "",
   "main": "dist/server.js",
   "scripts": {
-    "test": "jest --coverage",
+    "test": "jest",
+    "test-coverage": "jest --coverage",
     "build": "tsc & npm run copy-files",
     "start": "tsc & npm run copy-files & node .",
     "dev": "tsc -w & npm run copy-files & nodemon .",
