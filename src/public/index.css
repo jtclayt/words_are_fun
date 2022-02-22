@@ -23,7 +23,7 @@ header h1 {
   text-align: center;
   border: 3px solid gray;
   border-radius: 5px;
-  font-size: xx-large;
+  font-size: 2rem;
   font-weight: bold;
 }
 
@@ -34,7 +34,7 @@ header h1 {
 
 .keyboard-button {
   margin: 5px;
-  font-size: x-large;
+  font-size: 1.2rem;
 }
 
 .container {
@@ -65,17 +65,22 @@ header h1 {
 }
 
 @media only screen and (max-width: 500px) {
+  header {
+    padding: 5px 15px;
+    font-size: 1rem;
+  }
+
   .block {
-    height: 60px;
-    width: 45px;
-    margin: 5px;
-    line-height: 60px;
-    font-size: x-large;
+    height: 50px;
+    width: 40px;
+    margin: 3px;
+    line-height: 50px;
+    font-size: 1rem;
   }
 
   .keyboard-button {
     margin: 3px;
-    font-size: medium;
+    font-size: 0.6rem;
   }
 
   #keyboard {
