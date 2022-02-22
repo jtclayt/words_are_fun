@@ -32,6 +32,11 @@ header h1 {
   justify-content: center;
 }
 
+.keyboard-button {
+  margin: 5px;
+  font-size: x-large;
+}
+
 .container {
   width: 80vw;
   margin: 0 auto;
@@ -45,8 +50,35 @@ header h1 {
   background: #ebd80e;
 }
 
+.unavailable {
+  background: #ababab;
+}
+
 #gameboard {
   margin-top: 20px;
   display: flex;
   flex-direction: column;
+}
+
+#keyboard {
+  margin-top: 20px;
+}
+
+@media only screen and (max-width: 500px) {
+  .block {
+    height: 60px;
+    width: 45px;
+    margin: 5px;
+    line-height: 60px;
+    font-size: x-large;
+  }
+
+  .keyboard-button {
+    margin: 3px;
+    font-size: medium;
+  }
+
+  #keyboard {
+    margin-top: 10px;
+  }
 }
