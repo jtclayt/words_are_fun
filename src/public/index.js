@@ -15,8 +15,9 @@
   };
   const KEYBOARD_LAYOUT = [
     ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
-    ["A", "S", "D", "F", "G", "H", "J", "K", "L", "Enter"],
-    ["Z", "X", "C", "V", "B", "N", "M", "Backspace"]
+    ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
+    ["Z", "X", "C", "V", "B", "N", "M"],
+    ["Backspace", "Enter"]
   ]
 
   /** Does the setup things. */
@@ -50,6 +51,7 @@
 
       gameBoard.append(currentRow);
     }
+    updateRowBorders(true);
   }
 
   /**
@@ -69,6 +71,7 @@
   function createBlock() {
     const block = gen("p");
     block.classList.add("block");
+    block.classList.add("inactive-border");
     return block;
   }
 
@@ -82,6 +85,7 @@
     const keyButton = gen("button");
     keyButton.textContent = key;
     keyButton.classList.add("keyboard-button");
+    keyButton.classList.add("gray");
     keyButton.setAttribute("id", `key-${key}`);
     keyButton.addEventListener("click", () => processLetterInput(keyCode, key));
     return keyButton;
@@ -183,22 +187,28 @@
 
     resultArray.forEach((letterResult, index) => {
       const letterButton = id(`key-${currentGuess[index].toUpperCase()}`);
+      console.log(letterButton.classList.contains("green"));
       switch (letterResult) {
         case "g":
-          letterButton.classList.remove("warning");
-          letterButton.classList.add("success");
-          gameGrid[currentGuessNumber-1][index].classList.add("success");
+          letterButton.classList.remove("gray");
+          letterButton.classList.remove("dark-gray");
+          letterButton.classList.remove("yellow");
+          letterButton.classList.add("green");
+          gameGrid[currentGuessNumber-1][index].classList.add("green");
           break;
         case "y":
-          if (!letterButton.classList.contains("success")) {
-            letterButton.classList.add("warning");
+          if (!letterButton.classList.contains("green")) {
+            letterButton.classList.remove("gray");
+            letterButton.classList.remove("dark-gray");
+            letterButton.classList.add("yellow");
           }
           isGuessCorrect = false;
-          gameGrid[currentGuessNumber-1][index].classList.add("warning");
+          gameGrid[currentGuessNumber-1][index].classList.add("yellow");
           break;
         default:
-          if (!letterButton.classList.contains("success")) {
-            letterButton.classList.add("unavailable");
+          if (!letterButton.classList.contains("green") && !letterButton.classList.contains("yellow")) {
+            letterButton.classList.remove("gray");
+            letterButton.classList.add("dark-gray");
           }
           isGuessCorrect = false;
       }
@@ -208,8 +218,31 @@
       onEndGame(isGuessCorrect);
     }
 
+    updateRowBorders(false);
     currentGuessNumber++;
     currentGuess = "";
+  }
+
+  /**
+   * Update the row borders.
+   * @param {booelan} isFirstRow Whether the first row is the new active.
+   */
+  function updateRowBorders(isFirstRow) {
+    if (isFirstRow) {
+      gameGrid[currentGuessNumber-1].forEach(toggleBlockBorder);
+    } else {
+      gameGrid[currentGuessNumber-1].forEach(toggleBlockBorder);
+      gameGrid[currentGuessNumber].forEach(toggleBlockBorder);
+    }
+  }
+
+  /**
+   * Toggle a blocks border light/dark.
+   * @param {object} block HTML element for the block.
+   */
+  function toggleBlockBorder(block) {
+    block.classList.toggle("active-border");
+    block.classList.toggle("inactive-border");
   }
 
   /**
