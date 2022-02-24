@@ -16,14 +16,12 @@ header h1 {
 }
 
 .block {
-  height: 75px;
-  width: 60px;
+  height: 65px;
+  width: 65px;
   margin: 7px;
-  line-height: 75px;
+  line-height: 65px;
   text-align: center;
-  border: 3px solid gray;
-  border-radius: 5px;
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: bold;
 }
 
@@ -37,21 +35,33 @@ header h1 {
   font-size: 1.2rem;
 }
 
+.active-border {
+  border: 2px solid black;
+}
+
+.inactive-border {
+  border: 2px solid gray;
+}
+
 .container {
   width: 80vw;
   margin: 0 auto;
 }
 
-.success {
+.green {
   background: #2bd40d;
 }
 
-.warning {
+.yellow {
   background: #ebd80e;
 }
 
-.unavailable {
+.dark-gray {
   background: #ababab;
+}
+
+.gray {
+  background: #ebebeb;
 }
 
 #gameboard {
@@ -71,16 +81,16 @@ header h1 {
   }
 
   .block {
-    height: 50px;
+    height: 40px;
     width: 40px;
     margin: 3px;
-    line-height: 50px;
-    font-size: 1rem;
+    line-height: 40px;
+    font-size: 1.1rem;
   }
 
   .keyboard-button {
     margin: 3px;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
   }
 
   #keyboard {
