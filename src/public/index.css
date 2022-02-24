@@ -32,6 +32,9 @@ header h1 {
 
 .keyboard-button {
   margin: 5px;
+  padding: 5px;
+  width: auto;
+  height: 60px;
   font-size: 1.2rem;
 }
 
@@ -90,6 +93,9 @@ header h1 {
 
   .keyboard-button {
     margin: 3px;
+    padding: 3px;
+    width: auto;
+    height: 50px;
     font-size: 0.8rem;
   }
 
