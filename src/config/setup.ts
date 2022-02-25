@@ -1,10 +1,11 @@
 import * as appInsights from "applicationinsights";
 import express from "express";
-import { wordController } from "../controllers/word.controller";
 
 import { App } from "../app";
 import { MSSqlClient } from "../clients/mssql.client";
 import { EnvironmentKeys } from "./constants";
+import { sessionController } from "../controllers/session.controller";
+import { dbInit } from "./db-init";
 
 /** Setup resources for API. */
 export const setup = () => {
@@ -42,6 +43,7 @@ const setupDBConnection = () => {
     .authenticate()
     .then(() => {
       console.log("DB connection established.");
+      dbInit();
     }).catch(error => {
       console.log(`DB setup error: ${error}`);
       throw error;
@@ -54,5 +56,5 @@ const registerExpress = () => {
   App.instance.use(express.json());
   App.instance.use(express.urlencoded({extended: true}));
 
-  wordController();
+  sessionController();
 }

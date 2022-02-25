@@ -5,7 +5,7 @@
 
   // Just some game params maybe someday it will use an API
   let currentGuess;
-  let wordId;
+  let sessionId;
   let currentGuessNumber;
   let gameGrid;
   const KEYS = {
@@ -21,14 +21,21 @@
   ]
 
   /** Does the setup things. */
-  function init() {
-    getNewWord();
+  function init(_, isReset=false) {
+    sessionId = localStorage.getItem("sessionId");
+    console.log(sessionId, isReset);
     currentGuessNumber = 1;
     currentGuess = "";
     gameGrid = [];
     document.onkeydown = getLetterListener;
     resetGameBoard();
     resetKeyBoard();
+
+    if (sessionId && !isReset) {
+      getSessionData();
+    } else {
+      getNewWord();
+    }
   }
 
   /** Get this party started. */
@@ -51,7 +58,7 @@
 
       gameBoard.append(currentRow);
     }
-    updateRowBorders(true);
+    updateRowBorders();
   }
 
   /**
@@ -77,8 +84,8 @@
 
   /**
    * Creates a button for the visual keyboard.
-   * @param {*} keyCode The keycode for the button (matches standard keyboard).
-   * @param {*} key The key to display on keyboard.
+   * @param {number} keyCode The keycode for the button (matches standard keyboard).
+   * @param {string} key The key to display on keyboard.
    * @returns The new button.
    */
   function createKeyboardKey(keyCode, key) {
@@ -117,6 +124,11 @@
     processLetterInput(e.keyCode, e.key);
   }
 
+  /**
+   * Process the input of a keycode and a key
+   * @param {number} keyCode The keycode for the button (matches standard keyboard).
+   * @param {string} key The key to display on keyboard.
+   */
   function processLetterInput(keyCode, key) {
     if (keyCode >= KEYS.A && keyCode <= KEYS.Z) {
       if (currentGuess.length < 5) {
@@ -137,45 +149,93 @@
 
   /** Thinks pretty hard about words and stuff. */
   function submitWord() {
-    fetch("/check_word", {
+    fetch(`/sessions/${sessionId}`, {
       method: "POST",
       headers: {
         'Content-Type': 'application/json;charset=UTF-8'
       },
-      body: JSON.stringify({wordId: wordId, guess: currentGuess})
+      body: JSON.stringify({guess: currentGuess})
     }).then(checkStatus)
       .then(res => res.json())
-      .then(data => parseResult(data.result)).catch(handleError);
+      .then(data => {
+        parseResult(data.result);
+        if (data.isGameOver) {
+          onEndGame(data.isWin, data.word);
+        }
+      }).catch(handleError);
   }
 
   /**
    * We are in the endgame now.
    * @param {boolean} isWinner Wowie you could be a winner.
+   * @param {string} word The real word.
    */
-  function onEndGame(isWinner) {
+  function onEndGame(isWinner, word) {
     document.onkeydown = () => {};
 
     setTimeout(() => {
       if (isWinner) {
-        alert("congrats");
+        alert(`Nice you got it in ${currentGuessNumber - 1} guesses`);
       } else {
-        alert("you suck")
+        alert(`Aww, you didn't get it. The word was ${word}.`);
       }
     }, 500)
 
     setTimeout(() => {
-      init();
+      init(null, true);
     }, 2000)
+  }
+
+  /** Load session data for the user and process previous guesses */
+  function getSessionData() {
+    fetch(`/sessions/${sessionId}`)
+        .then(checkStatus)
+        .then(res => res.json())
+        .then(data => {
+          if (data.guesses) {
+            data.guesses.split(",").forEach(previousGuess => {
+              const [word, result] = previousGuess.split(":");
+              word.toUpperCase().split("").forEach(letter => {
+                processLetterInput(KEYS[letter], letter);
+              });
+              parseResult(result.split(""));
+              currentGuess = "";
+            });
+          }
+          if (currentGuessNumber >= 6) {
+            getNewWord();
+          }
+        }).catch(handleGetSessionError);
   }
 
   /** Pull a new word from the API. */
   function getNewWord() {
-    fetch("/new_word")
-      .then(checkStatus)
-      .then(res => res.json())
-      .then(data => {
-        wordId = data.wordId;
-      }).catch(handleError);
+    if (sessionId) {
+      fetch(`/sessions/${sessionId}/reset`, {method: "POST"})
+        .then(checkStatus)
+        .then(res => res.json())
+        .then(data => {
+          console.log(data);
+          if (!data.reset) {
+            resetSession();
+          }
+        }).catch(handleError);
+    } else {
+      fetch("/sessions", {method: "POST"})
+        .then(checkStatus)
+        .then(res => res.json())
+        .then(data => {
+          localStorage.setItem("sessionId", data.sessionId);
+          sessionId = data.sessionId;
+        }).catch(handleError);
+    }
+  }
+
+  /** Clear the session id and retrieve new */
+  function resetSession() {
+    sessionId = null;
+    localStorage.removeItem("sessionId");
+    getNewWord();
   }
 
   /**
@@ -183,11 +243,8 @@
    * @param {list} resultArray The results from API.
    */
   function parseResult(resultArray) {
-    let isGuessCorrect = true;
-
     resultArray.forEach((letterResult, index) => {
       const letterButton = id(`key-${currentGuess[index].toUpperCase()}`);
-      console.log(letterButton.classList.contains("green"));
       switch (letterResult) {
         case "g":
           letterButton.classList.remove("gray");
@@ -202,7 +259,6 @@
             letterButton.classList.remove("dark-gray");
             letterButton.classList.add("yellow");
           }
-          isGuessCorrect = false;
           gameGrid[currentGuessNumber-1][index].classList.add("yellow");
           break;
         default:
@@ -210,29 +266,28 @@
             letterButton.classList.remove("gray");
             letterButton.classList.add("dark-gray");
           }
-          isGuessCorrect = false;
       }
     });
 
-    if (isGuessCorrect || currentGuessNumber === 6) {
-      onEndGame(isGuessCorrect);
-    }
-
-    updateRowBorders(false);
     currentGuessNumber++;
+    updateRowBorders();
     currentGuess = "";
   }
 
-  /**
-   * Update the row borders.
-   * @param {booelan} isFirstRow Whether the first row is the new active.
-   */
-  function updateRowBorders(isFirstRow) {
-    if (isFirstRow) {
+  /** Update the row borders. */
+  function updateRowBorders() {
+    console.log(currentGuessNumber);
+    if (currentGuessNumber === 1) {
+      // First row is being set active
       gameGrid[currentGuessNumber-1].forEach(toggleBlockBorder);
     } else {
-      gameGrid[currentGuessNumber-1].forEach(toggleBlockBorder);
-      gameGrid[currentGuessNumber].forEach(toggleBlockBorder);
+      // all other rows
+      gameGrid[currentGuessNumber-2].forEach(toggleBlockBorder);
+
+      if (currentGuessNumber < 6) {
+        // If not last row, don't set next row active
+        gameGrid[currentGuessNumber-1].forEach(toggleBlockBorder);
+      }
     }
   }
 
@@ -260,6 +315,11 @@
   /** This should probably do something */
   function handleError(error) {
     console.log(error);
+  }
+
+  /** When error occurs retrieving session data */
+  function handleGetSessionError() {
+    resetSession();
   }
 
   /**
