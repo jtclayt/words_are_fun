@@ -23,7 +23,6 @@
   /** Does the setup things. */
   function init(_, isReset=false) {
     sessionId = localStorage.getItem("sessionId");
-    console.log(sessionId, isReset);
     currentGuessNumber = 1;
     currentGuess = "";
     gameGrid = [];
@@ -215,7 +214,6 @@
         .then(checkStatus)
         .then(res => res.json())
         .then(data => {
-          console.log(data);
           if (!data.reset) {
             resetSession();
           }
@@ -276,7 +274,6 @@
 
   /** Update the row borders. */
   function updateRowBorders() {
-    console.log(currentGuessNumber);
     if (currentGuessNumber === 1) {
       // First row is being set active
       gameGrid[currentGuessNumber-1].forEach(toggleBlockBorder);
