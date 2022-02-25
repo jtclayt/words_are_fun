@@ -1,3 +1,4 @@
+/* Element selectors */
 body {
   font-family: "Roboto Slab", sans-serif;
 }
@@ -15,6 +16,11 @@ header h1 {
   padding: 0;
 }
 
+/* Class selectors */
+.active-border {
+  border: 2px solid black;
+}
+
 .block {
   height: 65px;
   width: 65px;
@@ -25,12 +31,17 @@ header h1 {
   font-weight: bold;
 }
 
-.row {
-  display: flex;
-  justify-content: center;
+.container {
+  width: 80vw;
+  margin: 0 auto;
+}
+
+.inactive-border {
+  border: 2px solid gray;
 }
 
 .keyboard-button {
+  min-width: 40px;
   margin: 5px;
   padding: 5px;
   width: auto;
@@ -38,19 +49,12 @@ header h1 {
   font-size: 1.2rem;
 }
 
-.active-border {
-  border: 2px solid black;
+.row {
+  display: flex;
+  justify-content: center;
 }
 
-.inactive-border {
-  border: 2px solid gray;
-}
-
-.container {
-  width: 80vw;
-  margin: 0 auto;
-}
-
+/* Colors */
 .green {
   background: #2bd40d;
 }
@@ -67,6 +71,7 @@ header h1 {
   background: #ebebeb;
 }
 
+/* ID selectors */
 #gameboard {
   margin-top: 20px;
   display: flex;
@@ -91,7 +96,12 @@ header h1 {
     font-size: 1.1rem;
   }
 
+  .container {
+    width: 100vw;
+  }
+
   .keyboard-button {
+    min-width: 25px;
     margin: 3px;
     padding: 5px;
     width: auto;
